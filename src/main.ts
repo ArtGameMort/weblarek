@@ -5,10 +5,10 @@ import { apiProducts } from './utils/data';
 import { Products } from './components/Models/Products';
 import { Cart } from './components/Models/Cart';
 import { Buyer } from './components/Models/Buyer';
-import { LarekApi } from './components/WebLarekAPI';
+import { WebLarekAPI } from './components/WebLarekAPI';
 
 const api = new Api(API_URL);
-const WebLarekAPI = new LarekApi(api);
+const weblarekapi = new WebLarekAPI(api);
 const productsModel = new Products();
 const cartModel = new Cart();
 const buyerModel = new Buyer();
@@ -43,7 +43,7 @@ console.log('Данные покупателя после очистки:', buye
 buyerModel.setEmail('test@test.ru');
 
 console.log('=== Запрос к серверу ===');
-WebLarekAPI.getProducts()
+weblarekapi.getProducts()
     .then(data => {
         productsModel.setItems(data.items);
         console.log('Каталог товаров, полученный с сервера:', productsModel.getItems());

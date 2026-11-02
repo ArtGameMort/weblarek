@@ -1,6 +1,6 @@
 import { IApi, IProductListResponse, IOrderRequest, IOrderResult } from '../types';
 
-export class LarekApi {
+export class WebLarekAPI {
     private api: IApi;
 
     constructor(api: IApi) {

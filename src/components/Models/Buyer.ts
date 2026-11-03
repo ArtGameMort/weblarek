@@ -1,4 +1,4 @@
-import { IBuyer, TPayment } from '../../types';
+import {IBuyer, TBuyerErrors, TPayment} from '../../types';
 
 export class Buyer {
     private payment: TPayment | null = null;
@@ -37,4 +37,21 @@ export class Buyer {
         this.phone = '';
         this.address = '';
     };
+
+    validate(): TBuyerErrors{
+        const errors: TBuyerErrors = {};
+        if (!this.payment){
+            errors.payment = "выбери способ оплаты"
+        }
+        if (!this.email){
+            errors.email = "Укажите email"
+        }
+        if (!this.phone){
+            errors.phone = "Укажите phone"
+        }
+        if (!this.address){
+            errors.address = "Укажите address"
+        }
+        return errors;
+    }
 }

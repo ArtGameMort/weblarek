@@ -38,9 +38,12 @@ buyerModel.setEmail('test@test.ru');
 buyerModel.setPhone('+71234567890');
 buyerModel.setAddress('Spb Vosstania 1');
 console.log('Данные покупателя:', buyerModel.getData());
+console.log('Ошибки валидации заполненных данных:', buyerModel.validate());
 buyerModel.clear();
 console.log('Данные покупателя после очистки:', buyerModel.getData());
+console.log('Ошибки валидации незаполненных данных:', buyerModel.validate());
 buyerModel.setEmail('test@test.ru');
+console.log('Валидация с частично заполненными данными:', buyerModel.validate());
 
 console.log('=== Запрос к серверу ===');
 weblarekapi.getProducts()

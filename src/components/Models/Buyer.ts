@@ -1,4 +1,5 @@
-import {IBuyer, TBuyerErrors, TPayment} from '../../types';
+import { IBuyer, TBuyerErrors, TPayment } from '../../types';
+import { IEvents } from '../base/Events';
 
 export class Buyer {
     private payment: TPayment | null = null;
@@ -6,28 +7,34 @@ export class Buyer {
     private phone: string = '';
     private address: string = '';
 
+    constructor(protected events: IEvents) {}
+
     setPayment(payment: TPayment): void {
         this.payment = payment;
+        this.events.emit('buyer:changed');
     }
 
     setEmail(email: string): void {
         this.email = email;
+        this.events.emit('buyer:changed');
     }
 
     setPhone(phone: string): void {
         this.phone = phone;
+        this.events.emit('buyer:changed');
     }
 
     setAddress(address: string): void {
         this.address = address;
+        this.events.emit('buyer:changed');
     }
 
     getData(): IBuyer {
         return {
-            address: this.address,
-            email: this.email,
             payment: this.payment,
+            email: this.email,
             phone: this.phone,
+            address: this.address,
         };
     }
 
@@ -36,22 +43,15 @@ export class Buyer {
         this.email = '';
         this.phone = '';
         this.address = '';
-    };
+        this.events.emit('buyer:changed');
+    }
 
-    validate(): TBuyerErrors{
+    validate(): TBuyerErrors {
         const errors: TBuyerErrors = {};
-        if (!this.payment){
-            errors.payment = "выбери способ оплаты"
-        }
-        if (!this.email){
-            errors.email = "Укажите email"
-        }
-        if (!this.phone){
-            errors.phone = "Укажите phone"
-        }
-        if (!this.address){
-            errors.address = "Укажите address"
-        }
+        if (!this.payment) errors.payment = 'Не выбран вид оплаты';
+        if (!this.email.trim()) errors.email = 'Укажите эмэйл';
+        if (!this.phone.trim()) errors.phone = 'Укажите телефон';
+        if (!this.address.trim()) errors.address = 'Укажите адрес';
         return errors;
     }
 }

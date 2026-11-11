@@ -5,7 +5,11 @@ export interface IApi {
     post<T extends object>(uri: string, data: object, method?: ApiPostMethods): Promise<T>;
 }
 
+import { categoryMap } from '../utils/constants';
+
 export type TPayment = 'card' | 'cash';
+
+export type TCategoryKey = keyof typeof categoryMap;
 
 export interface IProduct {
     id: string;
@@ -40,3 +44,26 @@ export interface IProductListResponse {
     total: number;
     items: IProduct[];
 }
+
+export interface ICard {
+    title: string;
+    price: number | null;
+}
+
+export interface IFormState {
+    valid: boolean;
+    errors: string;
+}
+
+export type TCardCatalog = Pick<IProduct, 'title' | 'category' | 'price'> & {
+    image: { src: string; alt: string };
+};
+
+export type TCardPreview = TCardCatalog & Pick<IProduct, 'description'> & {
+    buttonText: string;
+    buttonDisabled: boolean;
+};
+
+export type TCardBasket = Pick<IProduct, 'title' | 'price'> & {
+    index: number;
+};

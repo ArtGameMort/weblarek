@@ -12,6 +12,7 @@ import { TPayment } from './types';
 import { Header } from './components/views/Header';
 import { Gallery } from './components/views/Gallery';
 import { Modal } from './components/views/Modal';
+import { Page } from './components/views/Page';
 import { CardCatalog } from './components/views/CardCatalog';
 import { CardPreview } from './components/views/CardPreview';
 import { CardBasket } from './components/views/CardBasket';
@@ -32,6 +33,7 @@ const headerContainer = ensureElement<HTMLElement>('.header', document.body);
 const galleryContainer = ensureElement<HTMLElement>('.gallery', document.body);
 const modalContainer = ensureElement<HTMLElement>('#modal-container', document.body);
 
+const page = new Page(document.body);
 const header = new Header(events, headerContainer);
 const gallery = new Gallery(galleryContainer);
 const modal = new Modal(events, modalContainer);
@@ -44,7 +46,13 @@ const success = new Success(events, cloneTemplate('#success'));
 const cardPreview = new CardPreview(events, cloneTemplate('#card-preview'));
 
 weblarekapi.getProducts()
-    .then(data => productsModel.setItems(data.items))
+    .then(data => {
+        const items = data.items.map(item => ({
+            ...item,
+            image: `${CDN_URL}${item.image}`
+        }));
+        productsModel.setItems(items);
+    })
     .catch(err => console.error(err));
 
 // --- ПРЕЗЕНТЕР ---
@@ -56,7 +64,7 @@ events.on('catalog:changed', () => {
         });
         return card.render({
             title: item.title,
-            image: { src: `${CDN_URL}${item.image}`, alt: item.title },
+            image: { src: item.image, alt: item.title },   // ← уже полный путь
             category: item.category,
             price: item.price
         });
@@ -89,7 +97,7 @@ events.on('preview:changed', () => {
     modal.render({
         content: cardPreview.render({
             title: item.title,
-            image: { src: `${CDN_URL}${item.image}`, alt: item.title },
+            image: { src: item.image, alt: item.title },
             category: item.category,
             description: item.description,
             price: item.price,
@@ -157,19 +165,20 @@ events.on('contacts.phone:change', (data: { value: string }) => {
 
 events.on('buyer:changed', () => {
     const errors = buyerModel.validate();
+    const data = buyerModel.getData();
 
     const orderErrors = Object.values({ payment: errors.payment, address: errors.address }).filter(Boolean).join('; ');
     orderForm.render({
-        payment: buyerModel.getData().payment,
-        address: buyerModel.getData().address,
+        payment: data.payment,
+        address: data.address,
         valid: !errors.payment && !errors.address,
         errors: orderErrors
     });
 
     const contactsErrors = Object.values({ email: errors.email, phone: errors.phone }).filter(Boolean).join('; ');
     contactsForm.render({
-        email: buyerModel.getData().email,
-        phone: buyerModel.getData().phone,
+        email: data.email,
+        phone: data.phone,
         valid: !errors.email && !errors.phone,
         errors: contactsErrors
     });
@@ -202,8 +211,9 @@ events.on('success:close', () => {
 });
 
 events.on('modal:close', () => {
-    modal.close();
+    page.unlockScroll();
 });
 
-cartModel.clear();
-buyerModel.clear();
+events.on('modal:open', () => {
+    page.lockScroll();
+});

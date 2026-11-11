@@ -16,12 +16,12 @@ export class Modal extends Component<IModal> {
         this.contentElement = ensureElement<HTMLElement>('.modal__content', this.container);
 
         this.closeButton.addEventListener('click', () => {
-            this.events.emit('modal:close');
+            this.close();
         });
 
         this.container.addEventListener('click', (e) => {
             if (e.target === this.container) {
-                this.events.emit('modal:close');
+                this.close();
             }
         });
     }
@@ -30,12 +30,14 @@ export class Modal extends Component<IModal> {
         this.contentElement.replaceChildren(value);
     }
 
-    open() {
+    open(): void {
         this.container.classList.add('modal_active');
+        this.events.emit('modal:open');
     }
 
-    close() {
+    close(): void {
         this.container.classList.remove('modal_active');
         this.contentElement.replaceChildren();
+        this.events.emit('modal:close');
     }
 }
